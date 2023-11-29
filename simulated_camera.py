@@ -41,18 +41,27 @@ class FileVideoStreamTrack(MediaStreamTrack):
         return frame
 
 @app.route('/offer', methods=['POST'])
-async def on_offer():
+def on_offer():
     params = request.get_json()
-    offer = RTCSessionDescription(sdp=params["sdp"], type=params["type"])
 
-    pc = RTCPeerConnection()
-    pc.addTrack(FileVideoStreamTrack("file_example_MP4_640_3MG.mp4"))
+    # Create a new event loop for asynchronous operations
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
 
-    await pc.setRemoteDescription(offer)
-    answer = await pc.createAnswer()
-    await pc.setLocalDescription(answer)
+    async def handle_offer():
+        offer = RTCSessionDescription(sdp=params["sdp"], type=params["type"])
+        pc = RTCPeerConnection()
+        pc.addTrack(FileVideoStreamTrack("file_example_MP4_640_3MG.mp4"))
 
-    return json.dumps({"sdp": pc.localDescription.sdp, "type": pc.localDescription.type}), 200, {"Content-Type": "application/json"}
+        await pc.setRemoteDescription(offer)
+        answer = await pc.createAnswer()
+        await pc.setLocalDescription(answer)
+        return {"sdp": pc.localDescription.sdp, "type": pc.localDescription.type}
 
+    # Run the asynchronous function and get the result
+    response_data = loop.run_until_complete(handle_offer())
+    loop.close()
+
+    return jsonify(response_data)
 if __name__ == "__main__":
     app.run(host="localhost", port=8080, threaded=True)

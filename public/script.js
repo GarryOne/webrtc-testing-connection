@@ -35,48 +35,41 @@ function displayResult(message) {
 
 function createPeerConnection() {
     return new RTCPeerConnection({
+
         iceServers: [
             { urls: 'stun:stun.l.google.com:19302' }, // STUN server
-            {
-                urls: 'turn:your.turnserver.com:3478',  // TURN server
-                username: 'turn_username',
-                credential: 'turn_credential'
-            }
+            // {
+            //     urls: 'turn:your.turnserver.com:3478',  // TURN server
+            //     username: 'turn_username',
+            //     credential: 'turn_credential'
+            // }
         ]
     });
 }
 
-async function sendOffer(offer) {
-    console.log('sendOffer')
-    const response = await fetch('http://localhost:8080/offer', {
-        method: 'POST',
-        body: JSON.stringify(offer),
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    });
-    const answer = await response.json();
-    return answer;
-}
-
 async function setupConnection(peerConnection) {
-    console.log('setupConnection');
 
     // Create an offer
     const offer = await peerConnection.createOffer();
     await peerConnection.setLocalDescription(offer);
 
-    // Send offer to the simulated peer and get the answer
-    const answer = await sendOffer({
-        sdp: peerConnection.localDescription.sdp,
-        type: peerConnection.localDescription.type
-    });
 
-    // Set the remote description with the answer from the simulated peer
-    await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
+    const answer = await negotiate(peerConnection);
+    await peerConnection.setRemoteDescription(answer);
 
     return new Promise((resolve, reject) => {
+
+        peerConnection.addEventListener('track', function(evt) {
+            console.log('track received', {evt})
+            if (evt.track.kind == 'video') {
+                document.getElementById('video').srcObject = evt.streams[0];
+            } else {
+                document.getElementById('audio').srcObject = evt.streams[0];
+            }
+        });
+
         peerConnection.oniceconnectionstatechange = () => {
+            console.log({a: peerConnection.iceConnectionState})
             if (peerConnection.iceConnectionState === 'connected') {
                 resolve();
             } else if (['failed', 'disconnected', 'closed'].includes(peerConnection.iceConnectionState)) {
@@ -84,4 +77,51 @@ async function setupConnection(peerConnection) {
             }
         };
     });
+}
+
+
+
+// other example
+
+async function negotiate(pc) {
+    try {
+        pc.addTransceiver('video', { direction: 'recvonly' });
+        pc.addTransceiver('audio', { direction: 'recvonly' });
+
+        const offer = await pc.createOffer();
+        await pc.setLocalDescription(offer);
+
+        // wait for ICE gathering to complete
+        await new Promise((resolve) => {
+            if (pc.iceGatheringState === 'complete') {
+                resolve();
+            } else {
+                const checkState = () => {
+                    if (pc.iceGatheringState === 'complete') {
+                        pc.removeEventListener('icegatheringstatechange', checkState);
+                        resolve();
+                    }
+                };
+                pc.addEventListener('icegatheringstatechange', checkState);
+            }
+        });
+
+        const response = await fetch('http://localhost:8080/offer', {
+            body: JSON.stringify({
+                sdp: pc.localDescription.sdp,
+                type: pc.localDescription.type,
+            }),
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            method: 'POST'
+        });
+
+        const answer = await response.json();
+
+        return answer;
+    } catch (e) {
+        alert(`Error during negotiation: ${e}`);
+        throw e; // Rethrow the error if you need to handle it later
+    }
 }
