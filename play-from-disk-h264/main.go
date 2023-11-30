@@ -107,9 +107,13 @@ func main() { //nolint
 			for ; true; <-ticker.C {
 				nal, h264Err := h264.NextNAL()
 				if h264Err == io.EOF {
-					fmt.Printf("All video frames parsed and sent")
-					os.Exit(0)
-				}
+                    fmt.Printf("All video frames parsed and sent\n")
+                    // Restart the video from the beginning, or perform another action
+                    // For example, to restart the video, you might re-open the file and reset the h264 reader
+                    file.Seek(0, 0) // Resets the file pointer to the beginning
+                    h264, _ = h264reader.NewReader(file) // Resets the H264 reader
+                    continue
+                }
 				if h264Err != nil {
 					panic(h264Err)
 				}
@@ -171,9 +175,13 @@ func main() { //nolint
 			for ; true; <-ticker.C {
 				pageData, pageHeader, oggErr := ogg.ParseNextPage()
 				if oggErr == io.EOF {
-					fmt.Printf("All audio pages parsed and sent")
-					os.Exit(0)
-				}
+                    fmt.Printf("All audio pages parsed and sent\n")
+                    // Restart the audio from the beginning, or perform another action
+                    // For example, to restart the audio, you might re-open the file and reset the ogg reader
+                    file.Seek(0, 0) // Resets the file pointer to the beginning
+                    ogg, _, _ = oggreader.NewWith(file) // Resets the OGG reader
+                    continue
+                }
 
 				if oggErr != nil {
 					panic(oggErr)
@@ -210,13 +218,17 @@ func main() { //nolint
 			// Use webrtc.PeerConnectionStateDisconnected if you are interested in detecting faster timeout.
 			// Note that the PeerConnection may come back from PeerConnectionStateDisconnected.
 			fmt.Println("Peer Connection has gone to failed exiting")
-			os.Exit(0)
 		}
 	})
 
 	// Wait for the offer to be pasted
 
 	http.HandleFunc("/sdp", func(w http.ResponseWriter, r *http.Request) {
+
+	    w.Header().Set("Access-Control-Allow-Origin", "*")
+        w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+        w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With")
+
         // Parse SDP from query parameter
         offerSDP := r.URL.Query().Get("sdp")
         if offerSDP == "" {
@@ -260,7 +272,7 @@ func main() { //nolint
 
     // Start HTTP server
     log.Println("Starting HTTP server at http://localhost:8080")
-    log.Fatal(http.ListenAndServe(":8080", nil))
+    log.Fatal(http.ListenAndServe(":4000", nil))
 
 
 	// Block forever
