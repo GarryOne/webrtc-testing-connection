@@ -264,7 +264,7 @@ func main() { //nolint
         <-gatherComplete
 
         // Output the answer in base64 so we can paste it in browser
-        fmt.Println(signal.Encode(*peerConnection.LocalDescription()))
+        // fmt.Println(signal.Encode(*peerConnection.LocalDescription()))
 
         // Respond with the answer SDP
         fmt.Fprintf(w, signal.Encode(*peerConnection.LocalDescription()))
