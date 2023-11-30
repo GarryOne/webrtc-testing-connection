@@ -44,13 +44,30 @@ Following the tutorial, I've took a a sample video (`play-from-disk-h264/video.m
 and by running some `ffmpeg` commands I've generated the `output.h264` and `output.ogg` which are used for streaming (simulating a camera stream)
 
 
-# TODOs
+## TODOs
 
-1. Implement Docker compose networks to simulate NAT/Firewalls scenarios
+1. Implement Docker compose networks to simulate **NAT** / **Firewalls** scenarios
 2. Add a form where we'll insert the camera servers (URLs) that we want to test the connection and don't use anymore the hardcoded URL `http://127.0.0.1:4000`
-3. Add a form where we'll insert the available TURN/STUN servers/credentials
+3. Add a form where we'll insert the available **TURN** / **STUN** servers/credentials
 4. Store the sensitive data encrypted or/and into a database
+5. Resolve Known issues mentioned below
+
+## Known issue
+When you run the script manually as `go run main.go`, on **MacOS** you'll get a popup from the OS firewall, asking
+```
+Do you want the application “main” to accept incoming network connections?
+```
+
+Only click `Allow` will make the WebRTC connection work.
+If you start it through docker, you'll not get any popups of course, neither the connection will work.
+You'll gett these logs on the `go-webrtc` service:
+
+``` 
+onvu-tech-go-webrtfc-1  | Connection State has changed failed 
+onvu-tech-go-webrtfc-1  | Peer Connection State has changed: failed
+onvu-tech-go-webrtfc-1  | Peer Connection has gone to failed exiting
+```
 
 
-# Mentions
+## Mentions
 I did use ChatGPT
