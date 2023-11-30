@@ -75,24 +75,23 @@ async def offer(request):
             await pc.close()
             pcs.discard(pc)
 
+    @pc.on("track")
+    def on_track(track):
+        print("Received track", track.kind)
+
     # open media source
     audio, video = create_local_tracks(
         args.play_from, decode=not args.play_without_decoding
     )
 
-    if audio:
-        audio_sender = pc.addTrack(audio)
-        if args.audio_codec:
-            force_codec(pc, audio_sender, args.audio_codec)
-        elif args.play_without_decoding:
-            raise Exception("You must specify the audio codec using --audio-codec")
+    # Load the MP4 file
+    player = MediaPlayer('./file_example_MP4_640_3MG.mp4')
 
-    if video:
-        video_sender = pc.addTrack(video)
-        if args.video_codec:
-            force_codec(pc, video_sender, args.video_codec)
-        elif args.play_without_decoding:
-            raise Exception("You must specify the video codec using --video-codec")
+    # Add the audio and video tracks from the file to the connection
+    if player.audio:
+        pc.addTrack(player.audio)
+    if player.video:
+        pc.addTrack(player.video)
 
     await pc.setRemoteDescription(offer)
 

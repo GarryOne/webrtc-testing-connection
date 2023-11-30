@@ -1,0 +1,49 @@
+version: '3'
+
+services:
+  # Python aiortc service simulating the CCTV camera
+#  aiortc_service:
+#    image: python:3.8
+#    volumes:
+#      - ./aiortc_app:/app
+#    working_dir: /app
+#    command: python3 camera_simulator.py
+#    networks:
+#      - external_network
+#
+#  # JavaScript client application
+#  js_client:
+#    image: node:latest
+#    volumes:
+#      - ./js_client_app:/app
+#    working_dir: /app
+#    command: npm start
+#    networks:
+#      - internal_network
+#    ports:
+#      - "8080:8080" # Assuming your client app runs on port 8080
+#
+
+
+    go-webrtfc:
+      build:
+        context: ./play-from-disk-h264
+        dockerfile: Dockerfile
+      ports:
+        - "8080:8080"
+
+
+#  rtsp-relay:
+#    image: flaviostutz/rtsp-relay
+#    ports:
+#      - 8554:8554
+#    environment:
+#      - SOURCE_URL=file://samples/video.mp4
+#    volumes:
+#      - ./samples:/samples
+
+networks:
+  external_network:
+    driver: bridge
+  internal_network:
+    driver: bridge
