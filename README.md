@@ -2,11 +2,11 @@
 
 Client side
 1. Run `npm i -g live-server`
-2. Run "live-server public"
+2. Run `live-server public`
 3. See the result: https://127.0.0.1:8080
 
 Backend side
-1. Have go installed (`brew install go)
+1. Have `go` installed (`brew install go`)
 2. Run `cd play-from-disk-h264`
 3. Run `go run main.go`
 4. You'll have the WebRTC server available at: https://127.0.0.1:4000

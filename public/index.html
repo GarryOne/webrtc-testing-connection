@@ -1,34 +1,27 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>WebRTC Example</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-<h2>WebRTC Connection Types</h2>
-<select id="connectionType">
-    <option value="p2p">P2P / Local</option>
-    <option value="stun">STUN</option>
-    <option value="turn">TURN</option>
-</select>
-<button onclick="initializeConnection()">Initialize Connection</button>
+    <head>
+        <title>WebRTC Example</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <h2>WebRTC Connection Types</h2>
+        <select id="connectionType">
+            <option value="p2p">P2P / Local</option>
+            <option value="stun">STUN</option>
+            <option value="turn">TURN</option>
+        </select>
+        <button onclick="initializeConnection()">Initialize Connection</button>
 
-<h3>Connection Status</h3>
-<div id="connectionStatus">Awaiting connection...</div>
+        <h3>Connection Status</h3>
+        <div id="connectionStatus">Awaiting connection...</div>
 
-<!--<h3>Browser base64 Session Description</h3>-->
-<!--<textarea id="localSessionDescription" readonly="true"></textarea> <br />-->
 
-<!--<h3>Golang base64 Session Description</h3>-->
-<!--<textarea id="remoteSessionDescription"></textarea> <br/>-->
+        <h3>Video</h3>
+        <div id="remoteVideos"></div> <br />
 
-<!--<button onclick="startSession()">Start Session</button><br />-->
-
-<h3>Video</h3>
-<div id="remoteVideos"></div> <br />
-
-<h3>Logs</h3>
-<div id="logs"></div>
-<script src="client.js"></script>
-</body>
+        <h3>Logs</h3>
+        <div id="logs"></div>
+        <script src="client.js"></script>
+    </body>
 </html>
