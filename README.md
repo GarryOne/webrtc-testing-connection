@@ -31,7 +31,7 @@ Also, I've displayed the logs, the video streaming, and the connection status in
 
 ## How I've approached the problem
 
-I need to test connection through WebRTC ... where?
+I needed to test WebRTC connection to ... where?
 So, one of my initial targets was to build a server that simulates a camera, in order to be able to perform my testing scenarios.
 
 I've tried initially `aiortc` from python ecosystem and didn't work. 
@@ -40,8 +40,8 @@ What did work was `pion` package from go.
 I've took the below example and slightly modified the script to turn it from stdin/stdout to a HTTP Server so that I can use from my JS app
 https://github.com/pion/example-webrtc-applications/tree/master/play-from-disk-h264
 
-There you can see that I've took a a sample video (`play-from-disk-h264/video.mp4`) 
-and running some `ffmpeg` commands I've generated the `output.h264` and `output.ogg` which are used for streaming (simulating a camera stream)
+Following the tutorial, I've took a a sample video (`play-from-disk-h264/video.mp4`) 
+and by running some `ffmpeg` commands I've generated the `output.h264` and `output.ogg` which are used for streaming (simulating a camera stream)
 
 
 # TODOs
